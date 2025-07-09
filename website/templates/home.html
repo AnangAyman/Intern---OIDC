@@ -18,6 +18,7 @@
 
         <h3>Your Clients:</h3>
         {% for client in clients %}
+            <h4>{{ client.client_metadata["client_name"]}}</h4>
             <div class="client-card">
                 <pre>{{ client.client_info|tojson(indent=2) }}</pre>
                 <pre>{{ client.client_metadata|tojson(indent=2) }}</pre>

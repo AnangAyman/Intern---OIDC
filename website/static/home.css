@@ -69,3 +69,27 @@ button[type="submit"] {
     cursor: pointer;
     font-size: 14px;
 }
+
+.client-card {
+    background: #f9f9f9;
+    border: 1px solid #eee;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+}
+
+.client-title {
+    margin-top: 0;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e0e0e0;
+    font-size: 18px;
+    color: #333;
+}
+
+pre {
+    white-space: pre-wrap;
+    background: #efefef;
+    padding: 10px;
+    border-radius: 4px;
+}
