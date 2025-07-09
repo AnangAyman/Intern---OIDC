@@ -10,7 +10,10 @@
     {% if user %}
         <div class="header">
             <h2>Welcome, <strong>{{ user }}</strong>!</h2>
-            <a href="{{ url_for('.create_client') }}" class="button">Create New Client</a>
+            <div class="header-buttons">
+                <a href="{{ url_for('.create_client') }}" class="button">Create New Client</a>
+                <a href="{{ url_for('.logout') }}" class="button button-logout">Logout</a>
+            </div>
         </div>
 
         <h3>Your Clients:</h3>

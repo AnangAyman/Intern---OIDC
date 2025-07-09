@@ -44,6 +44,13 @@ def home():
         clients = []
     return render_template('home.html', user=user, clients=clients)
 
+@bp.route('/logout')
+def logout():
+    # Clear the user ID from the session
+    session.pop('id', None)
+    # Redirect to the home page
+    return redirect('/')
+
 
 def split_by_crlf(s):
     return [v for v in s.splitlines() if v]
