@@ -1,29 +1,39 @@
-<!doctype html>
-<title>OIDC App</title>
-<style>
-  body { font-family: sans-serif; }
-  pre { background: #eee; padding: 1em; }
-</style>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>OIDC App - Home</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}">
+</head>
+<body>
+<div class="container">
+    {% if user %}
+        <div class="header">
+            <h2>Welcome, <strong>{{ user }}</strong>!</h2>
+            <a href="{{ url_for('.create_client') }}" class="button">Create New Client</a>
+        </div>
 
-{% if user %}
-  <h2>Welcome, <strong>{{ user }}</strong>!</h2>
-  <a href="{{ url_for('.create_client') }}">Create New Client</a>
-  <h3>Your Clients:</h3>
-  {% for client in clients %}
-  <pre>{{ client.client_info|tojson(indent=2) }}</pre>
-  <pre>{{ client.client_metadata|tojson(indent=2) }}</pre>
-  {% endfor %}
-{% else %}
-  <form action="" method="post">
-    <h2>Login or Signup</h2>
-    <div>
-      <label>Username</label>
-      <input type="text" name="username" required>
-    </div>
-    <div>
-      <label>Email</label>
-      <input type="email" name="email" required>
-    </div>
-    <button type="submit">Login / Signup</button>
-  </form>
-{% endif %}
+        <h3>Your Clients:</h3>
+        {% for client in clients %}
+            <div class="client-card">
+                <pre>{{ client.client_info|tojson(indent=2) }}</pre>
+                <pre>{{ client.client_metadata|tojson(indent=2) }}</pre>
+            </div>
+        {% endfor %}
+    {% else %}
+        <h2>Login or Signup</h2>
+        <form action="" method="post">
+            <div>
+                <label>Username</label>
+                <input type="text" name="username" required>
+            </div>
+            <div>
+                <label>Email</label>
+                <input type="email" name="email" required>
+            </div>
+            <button type="submit">Login / Signup</button>
+        </form>
+    {% endif %}
+</div>
+</body>
+</html>

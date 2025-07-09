@@ -1,0 +1,52 @@
+/* Styles for home.html */
+body {
+    font-family: sans-serif;
+    background-color: #f4f7f6;
+    padding: 20px;
+}
+.container {
+    max-width: 800px;
+    margin: auto;
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+}
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+.button {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+}
+.client-card {
+    background: #f9f9f9;
+    border: 1px solid #eee;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+}
+pre {
+    white-space: pre-wrap;
+    background: #efefef;
+    padding: 10px;
+    border-radius: 4px;
+}
+form div {
+    margin-bottom: 10px;
+}
+input {
+    width: 98%;
+    padding: 8px;
+}
+button {
+    padding: 10px 15px;
+    cursor: pointer;
+}

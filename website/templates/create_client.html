@@ -1,47 +1,53 @@
-<style>
-  label, label > span { display: block; }
-  label { margin: 15px 0; }
-</style>
-
-<a href="/">Home</a>
-
-<form action="" method="post">
-  <label>
-    <span>Client Name</span>
-    <input type="text" name="client_name">
-  </label>
-  <label>
-    <span>Client URI</span>
-    <input type="url" name="client_uri">
-  </label>
-  <label>
-    <span>Allowed Scope</span>
-    <input type="text" name="scope">
-  </label>
-  <label>
-    <span>Redirect URIs</span>
-    <textarea name="redirect_uri" cols="30" rows="10"></textarea>
-  </label>
-  <label>
-    <span>Allowed Grant Types</span>
-    <textarea name="grant_type" cols="30" rows="10"></textarea>
-  </label>
-  <label>
-    <span>Allowed Response Types</span>
-    <textarea name="response_type" cols="30" rows="10"></textarea>
-  </label>
-  <label>
-    <span>Token Endpoint Auth Method</span>
-    <select name="token_endpoint_auth_method">
-      <option value="client_secret_basic">client_secret_basic</option>
-      <option value="client_secret_post">client_secret_post</option>
-      <option value="none">none</option>
-    </select>
-  </label>
-  <label>
-    <span>Is Internal?</span>
-    <input type="checkbox" name="is_internal" value="1"> This is an internal Client
-  </label>
-  </label>
-  <button>Submit</button>
-</form>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Client</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='create_client.css') }}">
+</head>
+<body>
+<div class="container">
+    <h2>Create a New Client</h2>
+    <p><a href="/">&larr; Back to Home</a></p>
+    <form action="" method="post">
+        <label>
+            <span>Client Name</span>
+            <input type="text" name="client_name" required>
+        </label>
+        <label>
+            <span>Client URI</span>
+            <input type="url" name="client_uri" required>
+        </label>
+        <label>
+            <span>Allowed Scope</span>
+            <input type="text" name="scope" value="openid profile email" required>
+        </label>
+        <label>
+            <span>Redirect URIs (one per line)</span>
+            <textarea name="redirect_uri" rows="3" required></textarea>
+        </label>
+        <label>
+            <span>Allowed Grant Types (one per line)</span>
+            <textarea name="grant_type" rows="3" required>authorization_code</textarea>
+        </label>
+        <label>
+            <span>Allowed Response Types (one per line)</span>
+            <textarea name="response_type" rows="3" required>code</textarea>
+        </label>
+        <label>
+            <span>Token Endpoint Auth Method</span>
+            <select name="token_endpoint_auth_method">
+                <option value="client_secret_basic">client_secret_basic</option>
+                <option value="client_secret_post">client_secret_post</option>
+                <option value="none">none</option>
+            </select>
+        </label>
+        <label style="display: flex; align-items: center; font-weight: normal;">
+            <input type="checkbox" name="is_internal" value="1" style="width: auto; margin-right: 10px;">
+            <span>This is an internal Client</span>
+        </label>
+        <button type="submit">Create Client</button>
+    </form>
+</div>
+</body>
+</html>
