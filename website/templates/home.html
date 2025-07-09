@@ -1,20 +1,29 @@
+<!doctype html>
+<title>OIDC App</title>
+<style>
+  body { font-family: sans-serif; }
+  pre { background: #eee; padding: 1em; }
+</style>
+
 {% if user %}
-  <style>pre{white-space:wrap}</style>
-<div>Logged in as <strong>{{user}}</strong></div>
-
-{% for client in clients %}
-<pre>
-{{ client.client_info|tojson }}
-{{ client.client_metadata|tojson }}
-</pre>
-<hr>
-{% endfor %}
-
-<br><a href="{{ url_for('.create_client') }}">Create Client</a>
-
+  <h2>Welcome, <strong>{{ user }}</strong>!</h2>
+  <a href="{{ url_for('.create_client') }}">Create New Client</a>
+  <h3>Your Clients:</h3>
+  {% for client in clients %}
+  <pre>{{ client.client_info|tojson(indent=2) }}</pre>
+  <pre>{{ client.client_metadata|tojson(indent=2) }}</pre>
+  {% endfor %}
 {% else %}
-<form action="" method="post">
-  <input type="text" name="username" placeholder="username">
-  <button type="submit">Login / Signup</button>
-</form>
+  <form action="" method="post">
+    <h2>Login or Signup</h2>
+    <div>
+      <label>Username</label>
+      <input type="text" name="username" required>
+    </div>
+    <div>
+      <label>Email</label>
+      <input type="email" name="email" required>
+    </div>
+    <button type="submit">Login / Signup</button>
+  </form>
 {% endif %}
