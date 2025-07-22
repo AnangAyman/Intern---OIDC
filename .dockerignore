@@ -1,0 +1,14 @@
+# Python virtual environment
+venv/
+*.pyc
+__pycache__/
+.env
+
+# Git files
+.git
+.gitignore
+
+# IDE and OS files
+.idea/
+.vscode/
+.DS_Store

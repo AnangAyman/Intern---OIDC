@@ -1,0 +1,12 @@
+# Specifies the Docker Compose file format version.
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "5001:8000" # Should be 5000 (flask default) but my 5000 port is used
+    volumes:
+      - .:/app
+    environment:
+      - FLASK_ENV=development
