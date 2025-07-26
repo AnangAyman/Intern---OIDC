@@ -1,10 +1,9 @@
-# migrate.py (MySQL-to-MySQL Version)
-
 import os
 from sqlalchemy import create_engine, Table, MetaData, Column, Integer, String, Boolean, DateTime
 from sqlalchemy.orm import sessionmaker
 import sys
 from dotenv import load_dotenv
+import urllib.parse
 
 load_dotenv()
 
@@ -15,15 +14,19 @@ DB_HOST = os.environ.get("DB_HOST")
 
 # Define OLD and NEW database names
 OLD_DB_NAME = "grapeweb_oidc"
-NEW_DB_NAME = "grapeweb_new_oidc" # This will be the DB used by the app
+NEW_DB_NAME = "grapeweb_new_oidc"
 
 if not all([DB_USER, DB_PASSWORD, DB_HOST]):
     print("FATAL: DB_USER, DB_PASSWORD, or DB_HOST environment variables are not set.")
     sys.exit(1)
 
+# --- Safely Encode Credentials ---
+encoded_user = urllib.parse.quote_plus(DB_USER)
+encoded_password = urllib.parse.quote_plus(DB_PASSWORD)
+
 # --- Database Connection URLs ---
-OLD_DB_URL = f"mysql+mysqlconnector://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{OLD_DB_NAME}"
-NEW_DB_URL = f"mysql+mysqlconnector://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{NEW_DB_NAME}"
+OLD_DB_URL = f"mysql+mysqlconnector://{encoded_user}:{encoded_password}@{DB_HOST}/{OLD_DB_NAME}"
+NEW_DB_URL = f"mysql+mysqlconnector://{encoded_user}:{encoded_password}@{DB_HOST}/{NEW_DB_NAME}"
 
 print("Connecting to MySQL databases...")
 try:
@@ -43,7 +46,7 @@ metadata = MetaData()
 # Define the OLD 'account' table structure based on your `DESCRIBE` output
 old_account_table = Table('account', metadata,
     Column('id', Integer, primary_key=True),
-    Column('login', String(255), primary_key=True), # This is the username
+    Column('login', String(255), primary_key=True),
     Column('name', String(255)),
     Column('given_name', String(255)),
     Column('family_name', String(255)),
@@ -53,7 +56,7 @@ old_account_table = Table('account', metadata,
     Column('mobile_number', String(255)),
 )
 
-# Define the NEW 'user' table that your application needs
+# Define the NEW 'user' table based on your app's models (and db.sqlite)
 new_user_table = Table('user', metadata,
     Column('id', Integer, primary_key=True),
     Column('username', String(40), unique=True, nullable=False),
@@ -72,11 +75,9 @@ def migrate_data():
     try:
         OldSession = sessionmaker(bind=old_engine)
         old_session = OldSession()
-
         NewSession = sessionmaker(bind=new_engine)
         new_session = NewSession()
 
-        # The new table will be called 'user' as defined by your app's model
         print(f"Creating table '{new_user_table.name}' in database '{NEW_DB_NAME}' if it doesn't exist...")
         metadata.create_all(new_engine, tables=[new_user_table])
 
@@ -92,7 +93,7 @@ def migrate_data():
 
             new_user_data = {
                 'id': user.id,
-                'username': user.login, # Mapping 'login' to 'username'
+                'username': user.login,
                 'email': user.email,
                 'email_verified': user.email_verified if user.email_verified is not None else False,
                 'name': user.name,
