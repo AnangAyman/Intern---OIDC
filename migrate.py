@@ -1,4 +1,4 @@
-# migrate.py (Final Version - Allows Duplicate/Null Emails)
+# migrate.py (Final Version with Batching and Progress Bar)
 
 import os
 from sqlalchemy import create_engine, Table, MetaData, Column, Integer, String, Boolean, DateTime
@@ -6,6 +6,7 @@ from sqlalchemy.orm import sessionmaker
 import sys
 from dotenv import load_dotenv
 import urllib.parse
+from tqdm import tqdm
 
 load_dotenv()
 
@@ -15,6 +16,7 @@ DB_PASSWORD = os.environ.get("DB_PASSWORD")
 DB_HOST = os.environ.get("DB_HOST")
 OLD_DB_NAME = "grapeweb_oidc"
 NEW_DB_NAME = "grapeweb_new_oidc"
+BATCH_SIZE = 500 # We will commit every 500 users
 
 if not all([DB_USER, DB_PASSWORD, DB_HOST]):
     print("FATAL: DB_USER, DB_PASSWORD, or DB_HOST environment variables are not set.")
@@ -52,13 +54,11 @@ old_account_table = Table('account', metadata,
     Column('phone_number', String(255)),
     Column('mobile_number', String(255)),
 )
-# Define the NEW 'user' table with the updated, less strict email column
 new_user_table = Table('user', metadata,
     Column('id', Integer, primary_key=True),
     Column('username', String(40), unique=True, nullable=False),
-    # --- THIS IS THE KEY SCHEMA CHANGE ---
-    Column('email', String(120), nullable=True, unique=False), # Email is now optional and not unique
-    Column('email_verified', Boolean, default=False, nullable=True),
+    Column('email', String(120), nullable=True, unique=False),
+    Column('email_verified', Boolean, default=False, nullable=False),
     Column('phone_number', String(20), nullable=True),
     Column('mobile_number', String(20), nullable=True),
     Column('name', String(200), nullable=True),
@@ -75,10 +75,8 @@ def migrate_data():
         NewSession = sessionmaker(bind=new_engine)
         new_session = NewSession()
 
-        # We will drop the old table first to ensure a clean slate
         print(f"Dropping table '{new_user_table.name}' in '{NEW_DB_NAME}' if it exists, for a clean migration...")
         new_user_table.drop(new_engine, checkfirst=True)
-
         print(f"Creating new, updated table '{new_user_table.name}' in database '{NEW_DB_NAME}'...")
         metadata.create_all(new_engine, tables=[new_user_table])
 
@@ -87,29 +85,34 @@ def migrate_data():
         print(f"Found {len(old_users)} users to migrate.")
 
         migrated_count = 0
-        for user in old_users:
-            new_user_data = {
-                'id': user.id,
-                'username': user.login,
-                'email': user.email, # Email can be null now
-                'email_verified': user.email_verified if user.email_verified is not None else False,
-                'name': user.name,
-                'given_name': user.given_name,
-                'family_name': user.family_name,
-                'phone_number': user.phone_number,
-                'mobile_number': user.mobile_number,
-            }
-            stmt = new_user_table.insert().values(new_user_data)
-            new_session.execute(stmt)
-            migrated_count += 1
-
-        if migrated_count > 0:
-            print(f"Committing {migrated_count} new users to the database...")
+        # --- BATCH PROCESSING LOGIC ---
+        for i in tqdm(range(0, len(old_users), BATCH_SIZE), desc="Migrating Users in Batches"):
+            batch = old_users[i:i + BATCH_SIZE]
+            
+            for user in batch:
+                new_user_data = {
+                    'id': user.id,
+                    'username': user.login,
+                    'email': user.email,
+                    'email_verified': user.email_verified if user.email_verified is not None else False,
+                    'name': user.name,
+                    'given_name': user.given_name,
+                    'family_name': user.family_name,
+                    'phone_number': user.phone_number,
+                    'mobile_number': user.mobile_number,
+                }
+                stmt = new_user_table.insert().values(new_user_data)
+                new_session.execute(stmt)
+                migrated_count += 1
+            
+            # Commit the batch to the database
             new_session.commit()
-
+        
+        print(f"\nTotal users migrated: {migrated_count}")
         print("\n✅ Migration completed successfully!")
 
     except Exception as e:
+        new_session.rollback() # Rollback any partial batch changes on error
         print(f"\n❌ An error occurred during migration: {e}")
     finally:
         if 'old_session' in locals() and old_session.is_active: old_session.close()
