@@ -22,21 +22,20 @@ def current_user():
 def home():
     if request.method == 'POST':
         username = request.form.get('username')
-        email = request.form.get('email')  # <-- ADD THIS LINE to get the email
-
-        # Check if email is provided
-        if not email:
-            return "Email is required.", 400
+        email = request.form.get('email') or None  # Email is optional
 
         user = User.query.filter_by(username=username).first()
+
         if not user:
-            # Pass the email when creating the new user
-            user = User(username=username, email=email) # <-- UPDATE THIS LINE
+            # If the user doesn't exist, create a new one with the username
+            user = User(username=username, email=email)
             db.session.add(user)
             db.session.commit()
+        
         session['id'] = user.id
+    
         return redirect('/')
-
+    
     user = current_user()
     if user:
         clients = OAuth2Client.query.filter_by(user_id=user.id).all()

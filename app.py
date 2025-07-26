@@ -1,6 +1,7 @@
 import os
 import urllib.parse
 from website import create_app
+from flask_migrate import Migrate
 
 # --- Safely Encode Credentials from Environment ---
 encoded_user = urllib.parse.quote_plus(os.environ.get('DB_USER', ''))
@@ -17,3 +18,17 @@ app = create_app({
     ),
     'SQLALCHEMY_TRACK_MODIFICATIONS': False,
 })
+
+from website.models import db
+migrate = Migrate(app, db)
+
+# --- THIS IS THE NEW CODE TO ADD ---
+# This block ensures that tables are created automatically.
+with app.app_context():
+    db.create_all()
+# --- END OF NEW CODE ---
+
+@app.cli.command()
+def initdb():
+    """Initializes the database."""
+    db.create_all()

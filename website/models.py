@@ -13,10 +13,10 @@ db = SQLAlchemy()
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(40), unique=True, nullable=False)  # preferred_username
-    email = db.Column(db.String(120), unique=True, nullable=False)
+    email = db.Column(db.String(120), nullable=True)
     email_verified = db.Column(Boolean, default=False)  # Indicates if the email is verified
-    phone_number = db.Column(db.String(20), unique=True, nullable=True)
-    mobile_number = db.Column(db.String(20), unique=True, nullable=True)
+    phone_number = db.Column(db.String(20), nullable=True)
+    mobile_number = db.Column(db.String(20), nullable=True)
     name = db.Column(String(120), nullable=True)  # Full name
     given_name = db.Column(String(40), nullable=True)  # First name
     family_name = db.Column(String(40), nullable=True)  # Last name
