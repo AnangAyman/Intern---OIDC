@@ -1,6 +1,6 @@
 import os
 import urllib.parse
-from website import create_app
+from website.app import create_app
 from flask_migrate import Migrate
 
 # --- Safely Encode Credentials from Environment ---
