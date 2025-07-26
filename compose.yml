@@ -5,8 +5,9 @@ services:
   web:
     build: .
     ports:
-      - "5001:8000" # Should be 5000 (flask default) but my 5000 port is used
+      - "5001:8000"
     volumes:
       - .:/app
-    environment:
-      - FLASK_ENV=development
+    # This line tells Compose to load variables from the .env file
+    env_file:
+      - .env
