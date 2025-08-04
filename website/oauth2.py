@@ -15,6 +15,8 @@ from authlib.oidc.core.grants import (
     OpenIDImplicitGrant as _OpenIDImplicitGrant,
     OpenIDHybridGrant as _OpenIDHybridGrant,
 )
+from authlib.oauth2.rfc7636 import CodeChallenge # Code challenge for pkce
+
 from authlib.oidc.core import UserInfo
 from werkzeug.security import gen_salt
 from .models import db, User
@@ -134,9 +136,9 @@ def config_oauth(app):
         save_token=save_token
     )
 
-    # support all openid grants
     authorization.register_grant(AuthorizationCodeGrant, [
         OpenIDCode(require_nonce=True),
+        CodeChallenge(required=True) # For PKCE
     ])
     authorization.register_grant(ImplicitGrant)
     authorization.register_grant(HybridGrant)

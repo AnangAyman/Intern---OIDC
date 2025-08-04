@@ -53,6 +53,7 @@ class OAuth2Client(db.Model, OAuth2ClientMixin):
         db.Integer, db.ForeignKey('user.id', ondelete='CASCADE', name='fk_oauth2code_user_id'))
     user = db.relationship('User')
     is_internal = db.Column(db.Integer, default=0)  # Indicates if the client is internal
+    code_challenge_method = db.Column(db.String(48), nullable=True)
 
 
 class OAuth2AuthorizationCode(db.Model, OAuth2AuthorizationCodeMixin):
